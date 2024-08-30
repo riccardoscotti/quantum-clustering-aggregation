@@ -19,7 +19,13 @@ from scipy.spatial.distance import pdist, squareform
 
 from utils.clustering_utils import evaluate_silhouettes, build_matrix
 
+import os 
+
 if __name__ == '__main__':
+  # saving folder path
+  output_folder = 'pulser'
+  os.makedirs(output_folder, exist_ok=True)
+
   # Dataset source:  
   # P. Fänti and S. Sieranoja  
   # K-means properties on six clustering benchmark datasets  
