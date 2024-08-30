@@ -1,0 +1,15 @@
+,label,silhouette,algorithm,cluster_name
+0,0,66.68699226364345,KMeans,KMeans_0
+1,1,31.8571412838803,KMeans,KMeans_1
+2,2,44.48802333155524,KMeans,KMeans_2
+3,3,71.48435344399395,KMeans,KMeans_3
+4,4,92.82364541543413,KMeans,KMeans_4
+5,5,33.23830626669853,KMeans,KMeans_5
+6,6,32.95203240316883,KMeans,KMeans_6
+7,7,70.44470537215102,SpectralClustering,SpectralClustering_7
+8,8,93.9655448778875,SpectralClustering,SpectralClustering_8
+9,9,67.91257183993247,SpectralClustering,SpectralClustering_9
+10,10,26.43049029069903,SpectralClustering,SpectralClustering_10
+11,11,33.35893550821562,SpectralClustering,SpectralClustering_11
+12,12,71.48435344399395,SpectralClustering,SpectralClustering_12
+13,13,26.801410844071977,SpectralClustering,SpectralClustering_13

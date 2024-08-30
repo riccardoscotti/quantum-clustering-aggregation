@@ -1,0 +1,13 @@
+,label,silhouette,algorithm,cluster_name
+0,0,89.42531593545236,DBSCAN,DBSCAN_0
+1,1,96.32275214710725,DBSCAN,DBSCAN_1
+2,2,75.3499483026195,DBSCAN,DBSCAN_2
+3,3,34.82131214692073,DBSCAN,DBSCAN_3
+4,4,28.740751903928405,DBSCAN,DBSCAN_4
+5,5,93.9655448778875,SpectralClustering,SpectralClustering_5
+6,6,67.91257183993247,SpectralClustering,SpectralClustering_6
+7,7,70.44470537215102,SpectralClustering,SpectralClustering_7
+8,8,33.35893550821562,SpectralClustering,SpectralClustering_8
+9,9,26.801410844071977,SpectralClustering,SpectralClustering_9
+10,10,71.48435344399395,SpectralClustering,SpectralClustering_10
+11,11,26.43049029069903,SpectralClustering,SpectralClustering_11
