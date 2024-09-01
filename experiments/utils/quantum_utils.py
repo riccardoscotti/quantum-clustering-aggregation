@@ -16,8 +16,8 @@ def plot_distribution(C, first_n=None, path=None):
     C = dict(sorted(C.items(), key=lambda item: item[1], reverse=True)[:n])
     normalized_occ = [(v / total)*100 for v in C.values()]
     plt.figure(figsize=(12, 6))
-    plt.xlabel("bitstrings")
-    plt.ylabel("counts")
+    plt.xlabel("Bitstrings")
+    plt.ylabel("Percentage of readings")
     plt.bar(C.keys(), normalized_occ, width=0.3)
     plt.xticks(rotation="vertical")
     
@@ -47,6 +47,8 @@ def evaluate_mapping(new_coords, *args):
 
 def qaa(params, reg, Q, show_output=False):
     Omega, delta_0, T = params
+    # rounding T to the closest multiple of 4 to avoid warnings
+    T = round(T / 4) * 4
     delta_f = -delta_0
     adiabatic_pulse = Pulse(
     InterpolatedWaveform(T, [1e-9, Omega, 1e-9]),

@@ -18,11 +18,24 @@ from utils.clustering_utils import evaluate_silhouettes, build_matrix, visualize
 from utils.quantum_utils import plot_distribution, evaluate_mapping, qaa
 
 import os 
+import sys
+import shutil
+import logging
 
 if __name__ == '__main__':
+  logging.basicConfig(stream=sys.stdout, level=logging.INFO)
+  logger = logging.getLogger(__name__)
+
   # setup of the output folder
-  output_folder = 'pulser'
+  current_folder = os.path.dirname(os.path.abspath(__file__))
+  output_folder = os.path.join(current_folder, 'pulser')
+
+  if os.path.exists(output_folder):
+     shutil.rmtree(output_folder)
+  
   os.makedirs(output_folder, exist_ok=True)
+  
+  logger.info('Output folder established')
 
   # Dataset source:  
   # P. Fänti and S. Sieranoja  
@@ -30,8 +43,9 @@ if __name__ == '__main__':
   # Applied Intelligence, 48 (12), 4743-4759, December 2018.  
     
   # It can be downloaded from [this](https://cs.joensuu.fi/sipu/datasets/) webpage, under section Shape sets > [Aggregation](https://cs.joensuu.fi/sipu/datasets/Aggregation.txt). 
-
-  dataset = pd.read_csv('./data/dataset.csv')
+  data_folder = os.path.join(current_folder, 'data')
+  dataset = pd.read_csv(os.path.join(data_folder, 'dataset.csv'))
+  logger.info('Dataset loaded')
 
   # for brevity, define a variable containing the coordinates
   points = dataset[['x', 'y']]
@@ -86,6 +100,8 @@ if __name__ == '__main__':
     
     dataset.loc[dataset[name] >= 0, name] += labels_offset
     labels_offset = dataset[name].max() + 1
+    
+  logger.info('Clustering algorithms run')
 
   ############ Silhouette and rand score ############
   silhouette_df = []
@@ -105,15 +121,19 @@ if __name__ == '__main__':
 
   # save cluster information
   clusters.to_csv(os.path.join(output_folder, 'clusters.csv'))
+  logger.info('Cluster information saved')
 
   # save clusterized points
   dataset.to_csv(os.path.join(output_folder, 'clusterized_dataset.csv'))
+  logger.info('Clusterized information saved')
 
-  ############ Saving first three clusters ############
+  ############ Saving clusters ############
   for index, clustering_algorithm in enumerate(clustering_algorithms):
     name, _ = clustering_algorithm 
     filename = os.path.join(output_folder, f'{name}.png')
     visualize_dataset(dataset['x'], dataset['y'], dataset[name], clusters.loc[clusters['algorithm'] == name], title=name, path=filename)
+
+  logger.info('Cluster plots saved')
 
   ############ Building adjacency matrix ############
   adjacency_matrix = build_matrix(dataset, clusters)
@@ -129,6 +149,8 @@ if __name__ == '__main__':
     for row in cinecubo:
       row_str = ' '.join(map(str, row))
       fp.write(row_str + '\n')
+  
+  logger.info('Adjacency matrix computed')
 
   ############ Saving matrix as image ############
   plt.figure()
@@ -141,12 +163,15 @@ if __name__ == '__main__':
   # save adjacency matrix
   np.savetxt(os.path.join(output_folder, 'adjacency_matrix.csv'), adjacency_matrix, delimiter=',')
 
+  logger.info('Adjacency matrix saved')
 
   ############ Building of graph ############
   G = nx.from_numpy_array(adjacency_matrix)
 
   # removing self loops for better readability
   G.remove_edges_from(nx.selfloop_edges(G))
+
+  logger.info('Adjacency graph computed')
 
   pos = nx.spring_layout(G, k=3, seed=1506)
 
@@ -161,6 +186,8 @@ if __name__ == '__main__':
   
   plt.savefig(os.path.join(output_folder, 'adjacency_graph.png'))
 
+  logger.info('Adjacency graph saved')
+
   # QUBO matrix is the adjacency matrix
   Q = adjacency_matrix
   shape = (len(Q), 2)
@@ -174,6 +201,8 @@ if __name__ == '__main__':
       method="CG",
       tol=1e-9,
   )
+
+  logger.info('Register built')
   coords = np.reshape(res.x, (len(Q), 2))
 
   qubits = dict(enumerate(coords))
@@ -186,21 +215,30 @@ if __name__ == '__main__':
       fig_name=os.path.join(output_folder, 'register.png'),
       show=False
   ) 
+  logger.info('Register plot saved')
 
   # define search space for parameters 
   space = [(0.1, np.median(Q[Q > 0].flatten())), (-10, -1), (1000, 5000)]
 
   result = gp_minimize(func=lambda params: qaa(params, reg, Q), dimensions=space, n_calls=10, random_state=1506)
 
+  logger.info('Hyperparameter optimization finished')
+
   best_params = result.x 
   best_value = result.fun 
 
-  print("Optimal parameters:", best_params)
-  print("Maximum cost value found:", best_value)
+  # print("Optimal parameters:", best_params)
+  # print("Maximum cost value found:", best_value)
 
   Omega, delta_0, T = best_params
+
+  # rounding T to the closest multiple of 4 to avoid warnings
+  T = round(T / 4) * 4
   delta_f = -delta_0
-  T = 5000
+
+  # save best parameters obtained with Bayesian optimization
+  pd.DataFrame([[*best_params, best_value]]).to_csv(os.path.join(output_folder, 'optimized_params.csv'),index=False, header=['omega', 'delta_0', 'T', 'min_cost'])
+  logger.info('Bayesian optimization parameters saved')
 
   adiabatic_pulse = Pulse(
   InterpolatedWaveform(T, [1e-9, Omega, 1e-9]),
@@ -212,15 +250,18 @@ if __name__ == '__main__':
   seq.declare_channel('ising', 'rydberg_global')
   seq.add(adiabatic_pulse, 'ising')
   seq.draw(fig_name=os.path.join(output_folder, 'sequence.png'), show=False)
+  logger.info('Sequence plot saved')
 
   simul = QutipEmulator.from_sequence(seq)
   results = simul.run()
   final = results.get_final_state()
   count_dict = results.sample_final_state()
+  logger.info('Simulation run')
 
 
   # plotting readings distribution
   plot_distribution(count_dict, 20, path=os.path.join(output_folder, 'occurrences.png'))
+  logger.info('Occurences distribution plot saved')
 
   # plotting of resulting clusterizations
   bitstrings = list(sorted(count_dict, key=lambda k: count_dict[k], reverse=True))[:3]
@@ -238,6 +279,8 @@ if __name__ == '__main__':
           'QAA',
           path=os.path.join(output_folder, f'{bitstring}.png')
         )
+    
+  logger.info('Obtained clusterization plots saved')
   
   # rand score 
   plt.figure()
@@ -248,3 +291,6 @@ if __name__ == '__main__':
   plt.xticks(rotation=90)
 
   plt.savefig(os.path.join(output_folder, 'rand_scores.png'), bbox_inches='tight')
+
+  logger.info('Rand scores comparison plot saved')
+  logger.info('Script end')
