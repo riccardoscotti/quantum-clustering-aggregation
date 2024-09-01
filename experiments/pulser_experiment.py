@@ -3,26 +3,24 @@ import matplotlib.pyplot as plt
 import pandas as pd 
 
 from sklearn import cluster, mixture
-from sklearn.metrics import silhouette_samples, adjusted_rand_score
+from sklearn.metrics import adjusted_rand_score
 from skopt import gp_minimize
 
 import networkx as nx
-
-from itertools import islice, cycle
 
 from pulser import Pulse, Sequence, Register
 from pulser_simulation import QutipEmulator
 from pulser.devices import Chadoq2, DigitalAnalogDevice
 from pulser.waveforms import InterpolatedWaveform
 from scipy.optimize import minimize
-from scipy.spatial.distance import pdist, squareform
 
-from utils.clustering_utils import evaluate_silhouettes, build_matrix
+from utils.clustering_utils import evaluate_silhouettes, build_matrix, visualize_dataset, clusters_from_bitstring
+from utils.quantum_utils import plot_distribution, evaluate_mapping, qaa
 
 import os 
 
 if __name__ == '__main__':
-  # saving folder path
+  # setup of the output folder
   output_folder = 'pulser'
   os.makedirs(output_folder, exist_ok=True)
 
@@ -39,7 +37,7 @@ if __name__ == '__main__':
   points = dataset[['x', 'y']]
 
   original_silhouettes = evaluate_silhouettes(points, dataset['label'])
-  visualize_dataset(dataset['x'], dataset['y'], dataset['label'], original_silhouettes, 'Original dataset')
+  visualize_dataset(dataset['x'], dataset['y'], dataset['label'], original_silhouettes, 'Original dataset', path=os.path.join(output_folder, 'original_dataset.png'))
 
   clustering_seed = 1506
 
@@ -105,10 +103,17 @@ if __name__ == '__main__':
 
   clusters = pd.concat(silhouette_df, ignore_index=True)
 
+  # save cluster information
+  clusters.to_csv(os.path.join(output_folder, 'clusters.csv'))
+
+  # save clusterized points
+  dataset.to_csv(os.path.join(output_folder, 'clusterized_dataset.csv'))
+
   ############ Saving first three clusters ############
   for index, clustering_algorithm in enumerate(clustering_algorithms):
     name, _ = clustering_algorithm 
-    visualize_dataset(dataset['x'], dataset['y'], dataset[name], clusters.loc[clusters['algorithm'] == name], title=name)
+    filename = os.path.join(output_folder, f'{name}.png')
+    visualize_dataset(dataset['x'], dataset['y'], dataset[name], clusters.loc[clusters['algorithm'] == name], title=name, path=filename)
 
   ############ Building adjacency matrix ############
   adjacency_matrix = build_matrix(dataset, clusters)
@@ -120,7 +125,7 @@ if __name__ == '__main__':
     cinecubo.append(modified_row)
 
   cinecubo = np.array(cinecubo, dtype=object)
-  with open('./matrices/clustering_aggregation.txt', 'w') as fp:
+  with open(os.path.join(output_folder, 'adjacency_matrix_cinecubo.txt'), 'w') as fp:
     for row in cinecubo:
       row_str = ' '.join(map(str, row))
       fp.write(row_str + '\n')
@@ -131,7 +136,11 @@ if __name__ == '__main__':
   plt.xticks(np.arange(len(adjacency_matrix[0])), np.arange(len(adjacency_matrix[0])))
   plt.yticks(np.arange(len(adjacency_matrix[0])), np.arange(len(adjacency_matrix[0])))
   plt.grid(color='grey')
-  plt.show()
+  plt.savefig(os.path.join(output_folder, 'adjacency_matrix_fig.png'))
+
+  # save adjacency matrix
+  np.savetxt(os.path.join(output_folder, 'adjacency_matrix.csv'), adjacency_matrix, delimiter=',')
+
 
   ############ Building of graph ############
   G = nx.from_numpy_array(adjacency_matrix)
@@ -149,3 +158,93 @@ if __name__ == '__main__':
           font_size=12, 
           font_weight='bold'
           )
+  
+  plt.savefig(os.path.join(output_folder, 'adjacency_graph.png'))
+
+  # QUBO matrix is the adjacency matrix
+  Q = adjacency_matrix
+  shape = (len(Q), 2)
+  costs = []
+  np.random.seed(0)
+  x0 = np.random.random(shape).flatten()
+  res = minimize(
+      evaluate_mapping,
+      x0,
+      args=(Q, shape),
+      method="CG",
+      tol=1e-9,
+  )
+  coords = np.reshape(res.x, (len(Q), 2))
+
+  qubits = dict(enumerate(coords))
+
+  reg = Register(qubits)
+  reg.draw(
+      blockade_radius=Chadoq2.rydberg_blockade_radius(1.0),
+      draw_graph=True,
+      draw_half_radius=True,
+      fig_name=os.path.join(output_folder, 'register.png'),
+      show=False
+  ) 
+
+  # define search space for parameters 
+  space = [(0.1, np.median(Q[Q > 0].flatten())), (-10, -1), (1000, 5000)]
+
+  result = gp_minimize(func=lambda params: qaa(params, reg, Q), dimensions=space, n_calls=10, random_state=1506)
+
+  best_params = result.x 
+  best_value = result.fun 
+
+  print("Optimal parameters:", best_params)
+  print("Maximum cost value found:", best_value)
+
+  Omega, delta_0, T = best_params
+  delta_f = -delta_0
+  T = 5000
+
+  adiabatic_pulse = Pulse(
+  InterpolatedWaveform(T, [1e-9, Omega, 1e-9]),
+  InterpolatedWaveform(T, [delta_0, 0, delta_f]),
+  0,
+  )
+
+  seq = Sequence(reg, DigitalAnalogDevice)
+  seq.declare_channel('ising', 'rydberg_global')
+  seq.add(adiabatic_pulse, 'ising')
+  seq.draw(fig_name=os.path.join(output_folder, 'sequence.png'), show=False)
+
+  simul = QutipEmulator.from_sequence(seq)
+  results = simul.run()
+  final = results.get_final_state()
+  count_dict = results.sample_final_state()
+
+
+  # plotting readings distribution
+  plot_distribution(count_dict, 20, path=os.path.join(output_folder, 'occurrences.png'))
+
+  # plotting of resulting clusterizations
+  bitstrings = list(sorted(count_dict, key=lambda k: count_dict[k], reverse=True))[:3]
+
+  for bitstring in bitstrings:
+      selected_points, selected_clusters = clusters_from_bitstring(bitstring, dataset, clusters)
+      if selected_points.shape[0] == dataset.shape[0]:
+          rand_scores[bitstring] = adjusted_rand_score(dataset['label'], selected_points['label'])
+
+      visualize_dataset(
+          selected_points['x'], 
+          selected_points['y'], 
+          selected_points['label'], 
+          clusters.loc[clusters['cluster_name'].isin(list(map(lambda cluster: f'{cluster[1]}_{cluster[0]}', selected_clusters)))], 
+          'QAA',
+          path=os.path.join(output_folder, f'{bitstring}.png')
+        )
+  
+  # rand score 
+  plt.figure()
+  plt.bar(rand_scores.keys(), rand_scores.values())
+  plt.title('Rand scores comparison')
+  plt.xlabel('Algorithm')
+  plt.ylabel('Rand score')
+  plt.xticks(rotation=90)
+
+  plt.savefig(os.path.join(output_folder, 'rand_scores.png'), bbox_inches='tight')

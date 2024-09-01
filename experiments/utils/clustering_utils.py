@@ -29,7 +29,7 @@ def get_colors(labels):
 
     return colors[labels]
 
-def visualize_dataset(x_points, y_points, labels, silhouettes, title):
+def visualize_dataset(x_points, y_points, labels, silhouettes, title, path=None):
     plt.figure()
     plt.scatter(x_points, y_points, color=get_colors(labels))
     plt.title(f'{title} ({x_points.shape[0]} points, total sil. {silhouettes["silhouette"].sum():.2f})')
@@ -49,7 +49,11 @@ def visualize_dataset(x_points, y_points, labels, silhouettes, title):
     
 
     plt.legend(handles=cluster_legend, title='Cluster', bbox_to_anchor=(1.05,1))
-    plt.show()
+
+    if path:
+        plt.savefig(path, bbox_inches='tight')
+    else:
+        plt.show()
 
 def evaluate_silhouettes(points, labels):
     clusterization = pd.DataFrame({'label': labels})
