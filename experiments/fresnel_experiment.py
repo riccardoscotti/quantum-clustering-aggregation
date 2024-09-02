@@ -28,7 +28,7 @@ if __name__ == '__main__':
 
   # setup of the output folder
   current_folder = os.path.dirname(os.path.abspath(__file__))
-  output_folder = os.path.join(current_folder, 'pulser')
+  output_folder = os.path.join(current_folder, 'fresnel')
 
   if os.path.exists(output_folder):
      shutil.rmtree(output_folder)
@@ -174,7 +174,7 @@ if __name__ == '__main__':
   logger.info('Adjacency graph computed')
 
   pos = nx.spring_layout(G, k=3, seed=1506)
-   
+
   plt.figure()
   nx.draw(G, 
           pos=pos,
@@ -189,109 +189,109 @@ if __name__ == '__main__':
 
   logger.info('Adjacency graph saved')
 
-  # QUBO matrix is the adjacency matrix
-  Q = adjacency_matrix
-  shape = (len(Q), 2)
-  costs = []
-  np.random.seed(0)
-  x0 = np.random.random(shape).flatten()
-  res = minimize(
-      evaluate_mapping,
-      x0,
-      args=(Q, shape),
-      method="CG",
-      tol=1e-9,
-  )
+  # # QUBO matrix is the adjacency matrix
+  # Q = adjacency_matrix
+  # shape = (len(Q), 2)
+  # costs = []
+  # np.random.seed(0)
+  # x0 = np.random.random(shape).flatten()
+  # res = minimize(
+  #     evaluate_mapping,
+  #     x0,
+  #     args=(Q, shape),
+  #     method="CG",
+  #     tol=1e-9,
+  # )
 
-  logger.info('Register built')
-  coords = np.reshape(res.x, (len(Q), 2))
+  # logger.info('Register built')
+  # coords = np.reshape(res.x, (len(Q), 2))
 
-  qubits = dict(enumerate(coords))
+  # qubits = dict(enumerate(coords))
 
-  reg = Register(qubits)
-  reg.draw(
-      blockade_radius=Chadoq2.rydberg_blockade_radius(1.0),
-      draw_graph=True,
-      draw_half_radius=True,
-      fig_name=os.path.join(output_folder, 'register.png'),
-      show=False
-  ) 
-  logger.info('Register plot saved')
+  # reg = Register(qubits)
+  # reg.draw(
+  #     blockade_radius=Chadoq2.rydberg_blockade_radius(1.0),
+  #     draw_graph=True,
+  #     draw_half_radius=True,
+  #     fig_name=os.path.join(output_folder, 'register.png'),
+  #     show=False
+  # ) 
+  # logger.info('Register plot saved')
 
-  # define search space for parameters 
-  space = [(0.1, np.median(Q[Q > 0].flatten())), (-10, -1), (1000, 5000)]
+  # # define search space for parameters 
+  # space = [(0.1, np.median(Q[Q > 0].flatten())), (-10, -1), (1000, 5000)]
 
-  result = gp_minimize(func=lambda params: qaa(params, reg, Q), dimensions=space, n_calls=10, random_state=1506)
+  # result = gp_minimize(func=lambda params: qaa(params, reg, Q), dimensions=space, n_calls=10, random_state=1506)
 
-  logger.info('Hyperparameter optimization finished')
+  # logger.info('Hyperparameter optimization finished')
 
-  best_params = result.x 
-  best_value = result.fun 
+  # best_params = result.x 
+  # best_value = result.fun 
 
-  # print("Optimal parameters:", best_params)
-  # print("Maximum cost value found:", best_value)
+  # # print("Optimal parameters:", best_params)
+  # # print("Maximum cost value found:", best_value)
 
-  Omega, delta_0, T = best_params
+  # Omega, delta_0, T = best_params
 
-  # rounding T to the closest multiple of 4 to avoid warnings
-  T = round(T / 4) * 4
-  delta_f = -delta_0
+  # # rounding T to the closest multiple of 4 to avoid warnings
+  # T = round(T / 4) * 4
+  # delta_f = -delta_0
 
-  # save best parameters obtained with Bayesian optimization
-  pd.DataFrame([[*best_params, best_value]]).to_csv(os.path.join(output_folder, 'optimized_params.csv'),index=False, header=['omega', 'delta_0', 'T', 'min_cost'])
-  logger.info('Bayesian optimization parameters saved')
+  # # save best parameters obtained with Bayesian optimization
+  # pd.DataFrame([[*best_params, best_value]]).to_csv(os.path.join(output_folder, 'optimized_params.csv'),index=False, header=['omega', 'delta_0', 'T', 'min_cost'])
+  # logger.info('Bayesian optimization parameters saved')
 
-  adiabatic_pulse = Pulse(
-  InterpolatedWaveform(T, [1e-9, Omega, 1e-9]),
-  InterpolatedWaveform(T, [delta_0, 0, delta_f]),
-  0,
-  )
+  # adiabatic_pulse = Pulse(
+  # InterpolatedWaveform(T, [1e-9, Omega, 1e-9]),
+  # InterpolatedWaveform(T, [delta_0, 0, delta_f]),
+  # 0,
+  # )
 
-  seq = Sequence(reg, DigitalAnalogDevice)
-  seq.declare_channel('ising', 'rydberg_global')
-  seq.add(adiabatic_pulse, 'ising')
-  seq.draw(fig_name=os.path.join(output_folder, 'sequence.png'), show=False)
-  logger.info('Sequence plot saved')
+  # seq = Sequence(reg, DigitalAnalogDevice)
+  # seq.declare_channel('ising', 'rydberg_global')
+  # seq.add(adiabatic_pulse, 'ising')
+  # seq.draw(fig_name=os.path.join(output_folder, 'sequence.png'), show=False)
+  # logger.info('Sequence plot saved')
 
-  simul = QutipEmulator.from_sequence(seq)
-  results = simul.run()
-  final = results.get_final_state()
-  count_dict = results.sample_final_state()
-  logger.info('Simulation run')
+  # simul = QutipEmulator.from_sequence(seq)
+  # results = simul.run()
+  # final = results.get_final_state()
+  # count_dict = results.sample_final_state()
+  # logger.info('Simulation run')
 
 
-  # plotting readings distribution
-  plot_distribution(count_dict, 20, path=os.path.join(output_folder, 'occurrences.png'))
-  logger.info('Occurences distribution plot saved')
+  # # plotting readings distribution
+  # plot_distribution(count_dict, 20, path=os.path.join(output_folder, 'occurrences.png'))
+  # logger.info('Occurences distribution plot saved')
 
-  # plotting of resulting clusterizations
-  bitstrings = list(sorted(count_dict, key=lambda k: count_dict[k], reverse=True))[:3]
+  # # plotting of resulting clusterizations
+  # bitstrings = list(sorted(count_dict, key=lambda k: count_dict[k], reverse=True))[:3]
 
-  for bitstring in bitstrings:
-      selected_points, selected_clusters = clusters_from_bitstring(bitstring, dataset, clusters)
-      if selected_points.shape[0] == dataset.shape[0]:
-          rand_scores[bitstring] = adjusted_rand_score(dataset['label'], selected_points['label'])
+  # for bitstring in bitstrings:
+  #     selected_points, selected_clusters = clusters_from_bitstring(bitstring, dataset, clusters)
+  #     if selected_points.shape[0] == dataset.shape[0]:
+  #         rand_scores[bitstring] = adjusted_rand_score(dataset['label'], selected_points['label'])
 
-      visualize_dataset(
-          selected_points['x'], 
-          selected_points['y'], 
-          selected_points['label'], 
-          clusters.loc[clusters['cluster_name'].isin(list(map(lambda cluster: f'{cluster[1]}_{cluster[0]}', selected_clusters)))], 
-          'QAA',
-          path=os.path.join(output_folder, f'{bitstring}.png')
-        )
+  #     visualize_dataset(
+  #         selected_points['x'], 
+  #         selected_points['y'], 
+  #         selected_points['label'], 
+  #         clusters.loc[clusters['cluster_name'].isin(list(map(lambda cluster: f'{cluster[1]}_{cluster[0]}', selected_clusters)))], 
+  #         'QAA',
+  #         path=os.path.join(output_folder, f'{bitstring}.png')
+  #       )
     
-  logger.info('Obtained clusterization plots saved')
+  # logger.info('Obtained clusterization plots saved')
   
-  # rand score 
-  plt.figure()
-  plt.bar(rand_scores.keys(), rand_scores.values())
-  plt.title('Rand scores comparison')
-  plt.xlabel('Algorithm')
-  plt.ylabel('Rand score')
-  plt.xticks(rotation=90)
+  # # rand score 
+  # plt.figure()
+  # plt.bar(rand_scores.keys(), rand_scores.values())
+  # plt.title('Rand scores comparison')
+  # plt.xlabel('Algorithm')
+  # plt.ylabel('Rand score')
+  # plt.xticks(rotation=90)
 
-  plt.savefig(os.path.join(output_folder, 'rand_scores.png'), bbox_inches='tight')
+  # plt.savefig(os.path.join(output_folder, 'rand_scores.png'), bbox_inches='tight')
 
-  logger.info('Rand scores comparison plot saved')
-  logger.info('Script end')
+  # logger.info('Rand scores comparison plot saved')
+  # logger.info('Script end')
