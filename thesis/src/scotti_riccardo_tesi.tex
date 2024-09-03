@@ -23,7 +23,11 @@ headsepline, % Uncomment to get a line under the header
 
 \usepackage{mathpazo} % Use the Palatino font by default
 
-\usepackage[backend=bibtex,style=authoryear,natbib=true]{biblatex} % Use the bibtex backend with the authoryear citation style (which resembles APA)
+\usepackage[
+	backend=bibtex,
+	style=numeric,
+	natbib=true
+]{biblatex} % Use the bibtex backend with the authoryear citation style (which resembles APA)
 
 \addbibresource{bibliography.bib} % The filename of the bibliography
 
@@ -154,7 +158,7 @@ TODO
 %	BIBLIOGRAPHY
 %----------------------------------------------------------------------------------------
 
-% \printbibliography[heading=bibintoc]
+\printbibliography[heading=bibintoc]
 
 %----------------------------------------------------------------------------------------
 
