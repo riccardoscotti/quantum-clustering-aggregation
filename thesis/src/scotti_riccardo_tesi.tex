@@ -66,9 +66,13 @@ headsepline, % Uncomment to get a line under the header
 \faculty{\href{http://www.scienze.unibo.it/en}{School of Science}} 
 
 \AtBeginDocument{
-\hypersetup{pdftitle=\ttitle} 
-\hypersetup{pdfauthor=\authorname} 
-\hypersetup{pdfkeywords=\keywordnames}
+	\hypersetup{
+		pdftitle=\ttitle,
+		pdfauthor=\authorname,
+		pdfkeywords=\keywordnames,
+		linkcolor=black,
+		urlcolor=black
+	}
 }
 
 \begin{document}
@@ -132,6 +136,7 @@ TODO
 
 \include{chapters/01introduction}
 \include{chapters/02background}
+\include{chapters/03experimental_setup}
 
 %----------------------------------------------------------------------------------------
 %	THESIS CONTENT - APPENDICES
