@@ -206,7 +206,7 @@
 	justification=centerlast,
 	font=small,
 	% labelfont=sc,
-	margin=50pt
+	margin=20pt
 }
 
 %----------------------------------------------------------------------------------------

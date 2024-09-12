@@ -30,7 +30,8 @@ def get_colors(labels):
     return colors[labels]
 
 def visualize_dataset(x_points, y_points, labels, silhouettes, title, path=None):
-    plt.figure()
+    aspect_ratio = (max(x_points) - min(x_points)) / (max(y_points) - min(y_points))
+    plt.figure(figsize=(8, 8 / aspect_ratio))
     plt.scatter(x_points, y_points, color=get_colors(labels))
     plt.title(f'{title} ({x_points.shape[0]} points, total sil. {silhouettes["silhouette"].sum():.2f})')
     plt.grid()
@@ -51,7 +52,7 @@ def visualize_dataset(x_points, y_points, labels, silhouettes, title, path=None)
     plt.legend(handles=cluster_legend, title='Cluster', bbox_to_anchor=(1.05,1))
 
     if path:
-        plt.savefig(path, bbox_inches='tight')
+        plt.savefig(path, bbox_inches='tight', format='pdf')
     else:
         plt.show()
 
