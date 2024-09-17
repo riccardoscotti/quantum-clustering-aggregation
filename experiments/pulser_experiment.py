@@ -264,6 +264,10 @@ if __name__ == '__main__':
   plot_distribution(count_dict, 20, path=os.path.join(output_folder, 'occurrences.png'))
   logger.info('Occurences distribution plot saved')
 
+  # saving raw occurrences
+  count_df = pd.DataFrame(list(count_dict.items()), columns=['bitstrings', 'occurrences']).sort_values(by='occurrences', ascending=False)
+  count_df.to_csv(os.path.join(output_folder, 'raw_results.csv'), sep=',', index=False)
+
   # plotting of resulting clusterizations
   bitstrings = list(sorted(count_dict, key=lambda k: count_dict[k], reverse=True))[:3]
 

@@ -8,7 +8,35 @@ Clustering is widely employed in numerous scenarios that require to group togeth
 in image processing and computer vision, as a segmentation technique \cite{Gonzalez2017}, where it plays a pivotal role in various fields, such as remote image sensing \cite{remote-sensing} and digital forensics \cite{forensics}; % ref: gonzalez image processing capitolo su segmentation
 by energy distribution companies, to optimize the allocation of resources to end users. % ref: TODO
 
-\section{Basics of quantum computing}
+\subsection{Formal definition}
+Let $D = \{x_{1},...,x_{n}\}$ be a set of objects, also called \textit{dataset}; a clustering for $D$ is a collection of $k$ elements $\mathcal{C} =\{c_{1},...,c_{k}\}$, with $\mathcal{C} \subseteq \mathcal{P}(D)$, such that the following properties hold:
+\begin{equation}
+    \label{eqn:union}
+    D = \bigcup_{i=1}^{k} c_{i}
+\end{equation}
+\begin{equation}
+    \label{eqn:overlap}
+    c_{i} \cap c_{j} = \emptyset \quad \forall c_{i}, c_{j} \in \mathcal{C}.
+\end{equation}
+
+\subsection{Clustering aggregation}
+
+
+\section{Quantum computing}
+Quantum computing is a set of computational models and paradigms that combine concepts of computer science, physics and engineering. It offers an theoretical framework alternative to that of classical computing, which proved to be beneficial in certain areas of interest, such as cryptography and optimization. % ref?
+
+The basic ideas of quantum computing were established by Richard Feynman in a 1982 paper, discussing the usage of computers to perform physics simulations \cite{Feynman1982}. Feynman observed that, due to their inherent complexity, quantum systems could not be feasibly simulated by classical computers, and introduced the idea of computing machines based on quantum principles \cite{Feynman2017}. A subsequent work by Deutsch demonstrated, via the construction of a quantum Turing machine, that quantum computers are computationally equivalent to classical computers, and could therefore be useful for scopes beyond mere quantum simulation \cite{deutsch1985quantum}.
+
+\subsection{Elements of quantum computing}
+% citare Nielsen-Chuang
+The fundamental unit of information in quantum computing is the quantum bit, or qubit for short. Regardless of their physical realization, qubits are characterized by their state, which carries information. While the state of a classical bit is always only one of two logical values (usually called \texttt{0} and \texttt{1}), the state of a qubit works in a significantly different manner, reflecting the underlying principles of quantum mechanics. 
+
+% aggiungere postulati di QM? (Kaye-Laflamme-Mosca)
+Similarly to its classical counterpart, when the state of a qubit $\ket{\psi}$ is measured, it can assume either one of two logical values (usually called $\ket{0}$ and $\ket{1}$); the key difference with a bit is that the state of a qubit before it is measured is a linear combination of the two possible states:
+\begin{equation}
+  \ket{\psi} = \alpha \ket{0} + \beta \ket{1},
+\end{equation}
+where $(\alpha, \beta)$ is a unit vector of a Hilbert space or, in other words, $|\alpha|^{2} + |\beta|^{2} = 1$.
 
 \section{Quantum annealing}
 

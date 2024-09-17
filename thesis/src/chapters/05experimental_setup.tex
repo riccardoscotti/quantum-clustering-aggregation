@@ -2,6 +2,9 @@
 This chapter provides a description of the experimental setup used to evaluate the clustering aggregation protocol in different quantum computing environments, both on a simulator and on real hardware. The protocol was tested on three distinct platforms: a simulator for a neutral atom quantum computer, specifically the Pulser simulator by PASQAL; the Fresnel neutral atom quantum computer, also developed by PASQAL; the Advantage quantum annealer with Pegasus topology, developed by D-Wave.
 
 % aggiungere descrizione macchine 
+\section{Quantum platforms}
+\subsection{Pulser}
+
 
 
 \section{Dataset}
@@ -12,7 +15,7 @@ It is specifically designed to contain different shapes and configuration of poi
 
 \begin{figure}[ht!]
   \centering 
-  \includegraphics[width=0.65\textwidth]{figures/03experimental_setup/dataset.pdf}
+  \includegraphics[width=0.72\textwidth]{figures/05experimental_setup/dataset.pdf}
   \caption{Dataset plot}
   \label{fig:dataset}
 \end{figure}
@@ -55,7 +58,7 @@ where
 \subsection{Pulser experiment}
 The Pulser neutral atom computer simulator was used to test the aggregation protocol on the dataset discussed in \ref{sec:dataset}; 
 
-Two different clustering algorithms were run on the dataset, DBSCAN and Spectral Clustering. Hyperparameters were tuned empirically, in order to ensure an overall amount of clusters inferior or equal to 14, so as not to exceed the amount of qubits the simulator can handle. % includere referenza a qutip
+Two different clustering algorithms were run on the dataset, DBSCAN and Spectral Clustering. Hyperparameters were tuned empirically, in order to ensure an overall amount of clusters inferior or equal to 14, so as not to exceed the amount of qubits the simulator can handle \cite{Johansson2012}.
 
 \begin{figure}
   \centering 
