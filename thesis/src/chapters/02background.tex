@@ -1,3 +1,4 @@
+\newtheorem{postulate}{Postulate}
 \chapter{Background}
 \label{cha:background}
 
@@ -20,23 +21,54 @@ Let $D = \{x_{1},...,x_{n}\}$ be a set of objects, also called \textit{dataset};
 \end{equation}
 
 \subsection{Clustering aggregation}
+Clustering aggregation, also known as clustering ensemble, is a technique that aims to improve the robustness and overall quality of clustering results, by combining multiple clustering solutions into a single one \cite{vega2011survey}. 
+
+The motivation for utilizing clustering aggregation arises from the observation that no single clustering algorithm is universally optimal for all types of data or applications. Variability in initial conditions, distance metrics, and the inherent characteristics of the dataset can lead to different results, even when using the same algorithm. Aggregating these clustering solutions helps overcoming discrepancies and reduces the risk of selecting a sub optimal solution \cite{strehl2002cluster}.
 
 
 \section{Quantum computing}
-Quantum computing is a set of computational models and paradigms that combine concepts of computer science, physics and engineering. It offers an theoretical framework alternative to that of classical computing, which proved to be beneficial in certain areas of interest, such as cryptography and optimization. % ref?
+Quantum computing is a set of computational models and paradigms that combines concepts of computer science, physics and engineering. It offers an alternative perspective on computing to that of classical computing, both in terms of theoretical framework, as well as regarding the physical realization of machines.
 
 The basic ideas of quantum computing were established by Richard Feynman in a 1982 paper, discussing the usage of computers to perform physics simulations \cite{Feynman1982}. Feynman observed that, due to their inherent complexity, quantum systems could not be feasibly simulated by classical computers, and introduced the idea of computing machines based on quantum principles \cite{Feynman2017}. A subsequent work by Deutsch demonstrated, via the construction of a quantum Turing machine, that quantum computers are computationally equivalent to classical computers, and could therefore be useful for scopes beyond mere quantum simulation \cite{deutsch1985quantum}.
 
-\subsection{Elements of quantum computing}
-% citare Nielsen-Chuang
-The fundamental unit of information in quantum computing is the quantum bit, or qubit for short. Regardless of their physical realization, qubits are characterized by their state, which carries information. While the state of a classical bit is always only one of two logical values (usually called \texttt{0} and \texttt{1}), the state of a qubit works in a significantly different manner, reflecting the underlying principles of quantum mechanics. 
+\subsection{Qubits and quantum gates}
+\label{subsec:qubits}
+A classical computer can be analyzed, from an abstract point of view, as a system of bits, which represent information, and logical gates, which manipulate information; analogously, a quantum computer is composed of quantum bits, or qubits for short, and quantum gates. 
 
-% aggiungere postulati di QM? (Kaye-Laflamme-Mosca)
-Similarly to its classical counterpart, when the state of a qubit $\ket{\psi}$ is measured, it can assume either one of two logical values (usually called $\ket{0}$ and $\ket{1}$); the key difference with a bit is that the state of a qubit before it is measured is a linear combination of the two possible states:
-\begin{equation}
-  \ket{\psi} = \alpha \ket{0} + \beta \ket{1},
-\end{equation}
-where $(\alpha, \beta)$ is a unit vector of a Hilbert space or, in other words, $|\alpha|^{2} + |\beta|^{2} = 1$.
+A quantum computer differs from a classical computer in the fact that it is, at its core, a quantum system, and as such it abides to the laws of quantum mechanics. Some of these laws, referred to as the postulates of quantum mechanics, give a synthetic description of qubits and quantum gates \cite{Kaye2006}.
+
+\begin{postulate}[State space]
+  \label{pst:statespace}
+  The state of a quantum system is described by a unit vector in a Hilbert space $\mathcal{H}$.
+\end{postulate}
+
+\begin{postulate}[Evolution]
+  \label{pst:evolution}
+  The evolution of a system from one state to another is described by a unitary operator.
+\end{postulate}
+
+\begin{postulate}[Composition of systems]
+  \label{pst:composition}
+  When two systems, whose state spaces are $\mathcal{H}_{1}$ and $\mathcal{H}_{2}$, are treated as a unique, combined system, then the state space for the overall system is the tensor product of the single state spaces $\mathcal{H}_{1} \otimes \mathcal{H}_{2}$.
+\end{postulate}
+
+\begin{postulate}[Measurement]
+  \label{pst:measurement}
+  Given a system with state $$\ket{\psi} = \sum_{i} \alpha_{i} \ket{\varphi_{i}},$$ performing a measurement on the system will yield label $i$ as result with probability $|\alpha_{i}|^{2}$ and leave the system in the state $\ket{\varphi_{i}}$.
+\end{postulate}
+
+From postulate \ref{pst:statespace} follows one of the principal characteristics of qubits, which goes under the name of \textit{superposition}. While the state of a classical bit can only have one of its possible values (i.e. either \texttt{0} or \texttt{1}), the state of a qubit is a linear combination, or superposition, of multiple values. Supposing that a qubit can only have two values $\ket{0}$ and $\ket{1}$, it assumes the general form $$\ket{\psi} = \alpha \ket{0} + \beta \ket{1},$$ where $(\alpha, \beta)$ is a unit vector of a Hilbert space $\mathcal{H}$, or alternatively $|\alpha|^{2} + |\beta|^{2} = 1$. % inserire immagine sfera di Bloch? 
+
+Postulates \ref{pst:evolution} gives a mathematical description of quantum gates, and from it it is possible to derive the property that all quantum gates are invertible.
+
+Postulate \ref{pst:composition} states that multiple qubits can be analyzed as a single system and introduces the notion of \textit{entanglement}, the condition in which multiple qubits mutually affect the state of each other.
+
+Postulate \ref{pst:measurement} describes the operation of measurement; while the measurement of a classical bit does not, in principle, affect its value, measurement in quantum mechanics is a destructive operation that breaks superposition and puts a qubit in a single state. Furthermore, it explicitates the probabilistic nature of quantum systems.
+
+\subsection{Advantages of quantum computing}
+The peculiar characteristics of quantum computers, some of which mentioned in \ref{subsec:qubits}, make them better suited than classical computer at solving various tasks. An important result in quantum computing is Shor's algorithm for number factorization in polynomial time, which is not only a groundbraking result in computer science and mathematics, but has also important implications for cryptography and security \cite{Shor1997}. Other examples of remarkable results are in quantum chemistry simulation \cite{Kassal2011} and in solving optimization problems for logistics and finance \cite{Farhi2014}. 
+
+However, despite its promising advantages, quantum computing remains a mainly theoretical field, due to significant technological challenges in building reliable machines. Current quantum processors are limited by issues such as noise, error rates and decoherence, which hinder practical applications for most large scale problems \cite{Preskill2018}.
 
 \section{Quantum annealing}
 
