@@ -3,9 +3,18 @@ This chapter provides a description of the experimental setup used to evaluate t
 
 % aggiungere descrizione macchine 
 \section{Quantum platforms}
-\subsection{Pulser}
+\subsection{Programmable neutral-atom arrays}
 
+\subsection{QuTiP}
+The Quantum Toolbox in Python, also known as QuTiP, is an object oriented Python framework designed to represent and simulate the dynamics of open and closed quantum systems \cite{Johansson2012}. 
 
+The core of information representation in QuTiP is the \texttt{Qobj} class, which is used to represent both quantum states (such as pure states or density matrices) and quantum operators (such as Hamiltonians or measurement operators). The \texttt{Qobj} class offers methods to perform matrix operations like addition, multiplication and tensor product, which are essential to manipulate quantum systems; sparse matrix encoding of objects allows these operations to be executed relatively efficiently.
+
+To perform simulations using QuTiP, it is necessary to specify the initial conditions of the system, for example ket vectors or density matrices, and a Hamiltonian or other operators, which describe the time evolution and possible dissipations. It is then possible to select different kinds of solvers, such as the Monte Carlo wave function method for a Schrödinger equation describing evolution of pure states, or a numerical approach for a Lindblad master equation in the case of open systems.
+
+Results are presented in the form of evolved states at fixed intervals throughout the simulation time windows. Additionally, QuTiP allows the calculation of expectation values for observables (such as spin, position, or energy) over time.
+
+Since QuTiP does not directly support neutral atom systems, Pulser contains a library that acts as an interface to QuTiP, in order to simplify the definition of neutral-atom arrays and the simulation of experiments with laser pulses. 
 
 \section{Dataset}
 \label{sec:dataset}
