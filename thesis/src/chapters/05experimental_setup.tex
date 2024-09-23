@@ -1,5 +1,5 @@
 \chapter{Experimental setup}
-This chapter provides a description of the experimental setup used to evaluate the clustering aggregation protocol in different quantum computing environments, both on a simulator and on real hardware. The protocol was tested on three distinct platforms: a simulator for a neutral atom quantum computer, specifically the Pulser simulator by PASQAL; the Fresnel neutral atom quantum computer, also developed by PASQAL; the Advantage quantum annealer with Pegasus topology, developed by D-Wave.
+This chapter provides a description of the experimental setup used to evaluate the clustering aggregation protocol in different quantum computing environments, both on a simulator and on real hardware. The protocol was tested on three distinct platforms: a simulator for a neutral-atom quantum computer, specifically the Pulser simulator by PASQAL; the Fresnel neutral-atom quantum computer, also developed by PASQAL; the Advantage quantum annealer with Pegasus topology, developed by D-Wave.
 
 % aggiungere descrizione macchine 
 \section{Quantum platforms}
@@ -12,9 +12,9 @@ The core of information representation in QuTiP is the \texttt{Qobj} class, whic
 
 To perform simulations using QuTiP, it is necessary to specify the initial conditions of the system, for example ket vectors or density matrices, and a Hamiltonian or other operators, which describe the time evolution and possible dissipations. It is then possible to select different kinds of solvers, such as the Monte Carlo wave function method for a Schrödinger equation describing evolution of pure states, or a numerical approach for a Lindblad master equation in the case of open systems.
 
-Results are presented in the form of evolved states at fixed intervals throughout the simulation time windows. Additionally, QuTiP allows the calculation of expectation values for observables (such as spin, position, or energy) over time.
+Results are presented in the form of evolved states at fixed intervals throughout the simulation time windows. Additionally, QuTiP allows to perform the calculations of expectation values for observables (such as spin, position, or energy) over time.
 
-Since QuTiP does not directly support neutral atom systems, Pulser contains a library that acts as an interface to QuTiP, in order to simplify the definition of neutral-atom arrays and the simulation of experiments with laser pulses. 
+Since QuTiP does not directly support neutral-atom systems, Pulser contains a library that acts as an interface to QuTiP, in order to simplify the definition of neutral-atom arrays and the simulation of experiments with laser pulses. 
 
 \section{Dataset}
 \label{sec:dataset}
@@ -65,7 +65,7 @@ where
 \section{Description of experiments}
 
 \subsection{Pulser experiment}
-The Pulser neutral atom computer simulator was used to test the aggregation protocol on the dataset discussed in \ref{sec:dataset}; 
+The Pulser neutral-atom computer simulator was used to test the aggregation protocol on the dataset discussed in \ref{sec:dataset}; 
 
 Two different clustering algorithms were run on the dataset, DBSCAN and Spectral Clustering. Hyperparameters were tuned empirically, in order to ensure an overall amount of clusters inferior or equal to 14, so as not to exceed the amount of qubits the simulator can handle \cite{Johansson2012}.
 
