@@ -21,6 +21,8 @@ import os
 import sys
 import shutil
 import logging
+import json
+import time
 
 if __name__ == '__main__':
   logging.basicConfig(stream=sys.stdout, level=logging.INFO)
@@ -204,9 +206,11 @@ if __name__ == '__main__':
   )
 
   logger.info('Register built')
-  coords = np.reshape(res.x, (len(Q), 2))
+  coords = np.reshape(res.x, (len(Q), 2)).tolist()
 
   qubits = dict(enumerate(coords))
+  with open(os.path.join(output_folder, 'register.json'), 'w') as fp_register:
+    json.dump(qubits, fp_register)
 
   reg = Register(qubits)
   reg.draw(
@@ -254,7 +258,15 @@ if __name__ == '__main__':
   logger.info('Sequence plot saved')
 
   simul = QutipEmulator.from_sequence(seq)
+  start_time = time.time()
   results = simul.run()
+  end_time = time.time()
+
+  wall_time = end_time - start_time
+  # save wall_time 
+  with open(os.path.join(output_folder, 'simulation_data.json'), 'w') as fp_simulation_data:
+     json.dump({'simulation_time': wall_time}, fp_simulation_data)
+
   final = results.get_final_state()
   count_dict = results.sample_final_state()
   logger.info('Simulation run')

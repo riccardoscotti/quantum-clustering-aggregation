@@ -6,8 +6,8 @@
 4,4,71.94624608792968,DBSCAN,DBSCAN_4
 5,5,29.770115483160055,DBSCAN,DBSCAN_5
 6,6,26.801410844071977,DBSCAN,DBSCAN_6
-7,7,75.34994830261952,Spectral Clustering,Spectral Clustering_7
-8,8,96.32275214710725,Spectral Clustering,Spectral Clustering_8
-9,9,34.82131214692077,Spectral Clustering,Spectral Clustering_9
-10,10,89.42531593545235,Spectral Clustering,Spectral Clustering_10
+7,7,96.32275214710725,Spectral Clustering,Spectral Clustering_7
+8,8,89.42531593545235,Spectral Clustering,Spectral Clustering_8
+9,9,75.34994830261952,Spectral Clustering,Spectral Clustering_9
+10,10,34.82131214692077,Spectral Clustering,Spectral Clustering_10
 11,11,28.74075190392841,Spectral Clustering,Spectral Clustering_11
